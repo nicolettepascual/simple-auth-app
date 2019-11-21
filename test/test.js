@@ -12,7 +12,20 @@ describe('App', () => {
 const http = require('chai-http');
 chai.use(http);
 
-describe('App basics', () => {
+const User = require('../user')
+
+describe('App basics test', () => {
+
+  before( (done) => {
+    //delete all users 
+    User.find().deleteMany().then( res => {
+      console.log('Users removed');
+    }).catch(err => {
+      console.log(err.message);
+    });
+	done();
+  });
+
   it('Should exists', () => {
     expect(app).to.be.a('function');
   })
@@ -30,7 +43,7 @@ describe('App basics', () => {
 })
 
 describe('User registration', () => {
-  it('Should return 201 and confirmation for valid input', (done) => {
+  it('should return 201 and confirmation for valid input', (done) => {
     const new_user = {
       "name"  : "User Person",
       "email": "user@person.com",
@@ -41,12 +54,15 @@ describe('User registration', () => {
         .then((res) => {
 		  //console.log(res.body);
           expect(res).to.have.status(201);
-          expect(res.body.message).to.be.equal("User created!");
-          expect(res.body.errors.length).to.be.equal(0);
-          done();
+          expect(res.body.message).to.be.equal("User registered");
+          
+		  expect(res.body.user._id).to.exist;
+		  expect(res.body.user.createdAt).to.exist;
+		  
         }).catch(err => {
           console.log(err.message);
         })
+	done();	
   });
 
 })
